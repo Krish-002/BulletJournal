@@ -1,0 +1,895 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PlannerController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pa05-template</a> &gt; <a href="index.source.html" class="el_package">cs3500.pa05.controller</a> &gt; <span class="el_source">PlannerController.java</span></div><h1>PlannerController.java</h1><pre class="source lang-java linenums">package cs3500.pa05.controller;
+
+import cs3500.pa05.model.records.JsonUtils;
+import cs3500.pa05.model.records.WeekJson;
+import cs3500.pa05.model.Day;
+import cs3500.pa05.model.Event;
+import cs3500.pa05.model.FileReader;
+import cs3500.pa05.model.OutputFile;
+import cs3500.pa05.model.Task;
+import cs3500.pa05.model.Time;
+import cs3500.pa05.model.Week;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import javafx.application.HostServices;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.HPos;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+import javafx.stage.FileChooser;
+import javafx.stage.Popup;
+import javafx.stage.Stage;
+
+public class PlannerController implements IController {
+
+<span class="nc" id="L52">  Week week = new Week();</span>
+
+  @FXML
+  MenuItem addEventMenuItem;
+  @FXML
+  Button submitEvent;
+
+  @FXML
+  MenuItem templateMenuItem;
+
+  @FXML
+  MenuItem newWeekMenuItem;
+
+  @FXML
+  MenuItem addTaskMenuItem;
+  @FXML
+  MenuItem commitMenuItem;
+
+  @FXML
+  Button submitTask;
+
+  @FXML
+  MenuItem openMenuItem;
+
+  @FXML
+  MenuItem saveMenuItem;
+  Popup eventMaker;
+  Popup taskMaker;
+  Popup commitPopup;
+  Popup passwordSetterPopup;
+  Popup passwordEnter;
+  Stage stage;
+  File file;
+
+  //fxmls for event maker
+  @FXML
+  TextField eventNameTextField;
+  @FXML
+  TextArea eventDescriptionTextArea;
+  @FXML
+  ChoiceBox eventDayChoiceBox;
+  @FXML
+  ChoiceBox eventStartTimeChoiceBox;
+  @FXML
+  TextField eventDurationTextField;
+
+  //fxmls for task maker
+  @FXML
+  TextField taskNameTextField;
+
+  @FXML
+  TextArea taskDescriptionTextArea;
+
+  @FXML
+  ChoiceBox taskDayChoiceBox;
+
+  @FXML
+  GridPane taskOverviewGrid;
+
+  //gridpanes for events in days
+  @FXML
+  GridPane gridEvent1;
+  @FXML
+  GridPane gridEvent2;
+  @FXML
+  GridPane gridEvent3;
+  @FXML
+  GridPane gridEvent4;
+  @FXML
+  GridPane gridEvent5;
+  @FXML
+  GridPane gridEvent6;
+  @FXML
+  GridPane gridEvent7;
+
+  //gridpanes for tasks in days
+  @FXML
+  GridPane gridTask1;
+  @FXML
+  GridPane gridTask2;
+  @FXML
+  GridPane gridTask3;
+  @FXML
+  GridPane gridTask4;
+  @FXML
+  GridPane gridTask5;
+  @FXML
+  GridPane gridTask6;
+  @FXML
+  GridPane gridTask7;
+
+  @FXML
+  TabPane tabPane;
+
+  @FXML
+  ProgressBar progressBar;
+  @FXML
+  Label remainingTaskLabel;
+
+  @FXML
+  TextArea notesArea;
+  @FXML
+  Label totalEvents;
+  @FXML
+  Label totalTasks;
+  @FXML
+  Label completedTasks;
+  @FXML
+  Button settingsSave;
+  @FXML
+  TextField maxEvents;
+  @FXML
+  TextField maxTasks;
+  @FXML
+  Button settingsClose;
+
+  @FXML
+  HostServices hostServices;
+  @FXML
+  TextField searchBar;
+  @FXML
+  Button searchButton;
+  @FXML
+  PasswordField password1;
+  @FXML
+  PasswordField password2;
+  @FXML
+  Button buttonCreatePassword;
+  @FXML
+  MenuItem passwordMenuItem;
+
+  @FXML
+  Button closeEvent;
+
+  @FXML
+  Button closeTask;
+  @FXML
+  Button buttonCreatePasswordClose;
+  @FXML
+  Button buttonCheckPassword;
+  @FXML
+  Button buttonClosePassword;
+  @FXML
+  PasswordField enterPasswordField;
+  @FXML
+  Button saveNotesButton;
+
+
+<span class="nc" id="L200">  public PlannerController(Stage stage, HostServices hostServices) {</span>
+<span class="nc" id="L201">    this.stage = stage;</span>
+<span class="nc" id="L202">    this.hostServices = hostServices;</span>
+<span class="nc" id="L203">  }</span>
+
+  @Override
+  @FXML
+  public void run() throws IllegalStateException, IOException {
+<span class="nc" id="L208">    setShortcuts();</span>
+<span class="nc" id="L209">    eventMakerShow();</span>
+<span class="nc" id="L210">    taskMakerShow();</span>
+<span class="nc" id="L211">    commitmentMakerShow();</span>
+<span class="nc" id="L212">    openFile();</span>
+<span class="nc" id="L213">    saveFile();</span>
+<span class="nc" id="L214">    newWeek();</span>
+<span class="nc" id="L215">    progressBar();</span>
+<span class="nc" id="L216">    searchBar();</span>
+<span class="nc" id="L217">    chooseTemplate();</span>
+<span class="nc" id="L218">    passwordMakerShow();</span>
+<span class="nc" id="L219">    noteSaver();</span>
+<span class="nc" id="L220">  }</span>
+
+  private void noteSaver() {
+<span class="nc" id="L223">    saveNotesButton.setOnAction(e -&gt; {</span>
+<span class="nc" id="L224">      this.week.setNotes(notesArea.getText());</span>
+<span class="nc" id="L225">    });</span>
+<span class="nc" id="L226">  }</span>
+
+
+  private void newWeek() {
+<span class="nc" id="L230">    newWeekMenuItem.setOnAction(e -&gt; {</span>
+<span class="nc" id="L231">      FileChooser fileChooser = new FileChooser();</span>
+<span class="nc" id="L232">      fileChooser.setTitle(&quot;Choose File Location&quot;);</span>
+
+<span class="nc" id="L234">      File file = fileChooser.showSaveDialog(stage);</span>
+<span class="nc bnc" id="L235" title="All 2 branches missed.">      if (file != null) {</span>
+<span class="nc" id="L236">        String fileName = file.getName();</span>
+
+        // Check if the file already has an extension
+<span class="nc" id="L239">        int dotIndex = fileName.lastIndexOf(&quot;.&quot;);</span>
+<span class="nc bnc" id="L240" title="All 2 branches missed.">        if (dotIndex &gt;= 0) {</span>
+          // Remove the existing extension
+<span class="nc" id="L242">          fileName = fileName.substring(0, dotIndex);</span>
+        }
+
+        // Append the &quot;.bujo&quot; extension
+<span class="nc" id="L246">        fileName += &quot;.bujo&quot;;</span>
+<span class="nc" id="L247">        file = new File(file.getParent(), fileName);</span>
+
+        // Proceed with saving the file
+<span class="nc" id="L250">        OutputFile outputFile = new OutputFile(file);</span>
+<span class="nc" id="L251">        getDefault();</span>
+<span class="nc" id="L252">        outputFile.writeFile(JsonUtils.serializeRecord(this.week.toWeekJson()));</span>
+<span class="nc" id="L253">        FileReader fileReader = new FileReader(file.toPath());</span>
+
+<span class="nc" id="L255">        this.file = file;</span>
+<span class="nc" id="L256">        getDefault();</span>
+<span class="nc" id="L257">        updateGui();</span>
+<span class="nc" id="L258">      } else {</span>
+        // No file selected
+<span class="nc" id="L260">        System.out.println(&quot;No file selected.&quot;);</span>
+      }
+
+<span class="nc" id="L263">    });</span>
+<span class="nc" id="L264">  }</span>
+
+  private void setShortcuts() {
+    KeyCodeCombination shortcutSave;
+    KeyCodeCombination shortcutOpen;
+    KeyCodeCombination shortcutAddEvent;
+    KeyCodeCombination shortcutAddTask;
+    KeyCodeCombination shortcutCommitments;
+    KeyCodeCombination shortcutWeek;
+    KeyCodeCombination shortcutTemplate;
+    KeyCodeCombination shortcutPassword;
+
+<span class="nc bnc" id="L276" title="All 2 branches missed.">    if (System.getProperty(&quot;os.name&quot;).toLowerCase().contains(&quot;win&quot;)) {</span>
+<span class="nc" id="L277">      shortcutSave = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);</span>
+<span class="nc" id="L278">      shortcutOpen = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN);</span>
+<span class="nc" id="L279">      shortcutAddEvent = new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN);</span>
+<span class="nc" id="L280">      shortcutAddTask = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN);</span>
+<span class="nc" id="L281">      shortcutCommitments = new KeyCodeCombination(KeyCode.M, KeyCombination.CONTROL_DOWN);</span>
+<span class="nc" id="L282">      shortcutWeek = new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);</span>
+<span class="nc" id="L283">      shortcutTemplate = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN,</span>
+          KeyCombination.SHIFT_DOWN);
+<span class="nc" id="L285">      shortcutPassword = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);</span>
+    } else {
+<span class="nc" id="L287">      shortcutSave = new KeyCodeCombination(KeyCode.S, KeyCombination.META_DOWN);</span>
+<span class="nc" id="L288">      shortcutOpen = new KeyCodeCombination(KeyCode.O, KeyCombination.META_DOWN);</span>
+<span class="nc" id="L289">      shortcutAddEvent = new KeyCodeCombination(KeyCode.E, KeyCombination.META_DOWN);</span>
+<span class="nc" id="L290">      shortcutAddTask = new KeyCodeCombination(KeyCode.T, KeyCombination.META_DOWN);</span>
+<span class="nc" id="L291">      shortcutCommitments = new KeyCodeCombination(KeyCode.M, KeyCombination.META_DOWN);</span>
+<span class="nc" id="L292">      shortcutWeek = new KeyCodeCombination(KeyCode.N, KeyCombination.META_DOWN);</span>
+<span class="nc" id="L293">      shortcutTemplate = new KeyCodeCombination(KeyCode.T, KeyCombination.META_DOWN,</span>
+          KeyCombination.SHIFT_DOWN);
+<span class="nc" id="L295">      shortcutPassword = new KeyCodeCombination(KeyCode.P, KeyCombination.META_DOWN);</span>
+    }
+
+<span class="nc" id="L298">    saveMenuItem.setAccelerator(shortcutSave);</span>
+<span class="nc" id="L299">    openMenuItem.setAccelerator(shortcutOpen);</span>
+<span class="nc" id="L300">    addEventMenuItem.setAccelerator(shortcutAddEvent);</span>
+<span class="nc" id="L301">    addTaskMenuItem.setAccelerator(shortcutAddTask);</span>
+<span class="nc" id="L302">    newWeekMenuItem.setAccelerator(shortcutWeek);</span>
+<span class="nc" id="L303">    commitMenuItem.setAccelerator(shortcutCommitments);</span>
+<span class="nc" id="L304">    templateMenuItem.setAccelerator(shortcutTemplate);</span>
+<span class="nc" id="L305">    passwordMenuItem.setAccelerator(shortcutPassword);</span>
+<span class="nc" id="L306">  }</span>
+
+  void commitmentMakerShow() throws IOException {
+<span class="nc" id="L309">    commitMenuItem.setOnAction(event -&gt; showCommitMaker());</span>
+<span class="nc" id="L310">    this.commitPopup = new Popup();</span>
+<span class="nc" id="L311">    FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(&quot;Settings.fxml&quot;));</span>
+<span class="nc" id="L312">    loader.setController(this);</span>
+<span class="nc" id="L313">    Scene s = loader.load();</span>
+<span class="nc" id="L314">    this.commitPopup.getContent().add(s.getRoot());</span>
+<span class="nc" id="L315">    settingsSave.setOnAction(event -&gt; changeCommit());</span>
+<span class="nc" id="L316">    settingsClose.setOnAction(event -&gt; commitPopup.hide());</span>
+<span class="nc" id="L317">  }</span>
+
+  private void changeCommit() {
+<span class="nc" id="L320">    int maxEvent = -1;</span>
+<span class="nc" id="L321">    int maxTask = -1;</span>
+
+<span class="nc bnc" id="L323" title="All 2 branches missed.">    if (validateCommit(maxTask, maxEvent)) {</span>
+<span class="nc" id="L324">      maxEvent = Integer.parseInt(maxEvents.getText());</span>
+<span class="nc" id="L325">      maxTask = Integer.parseInt(maxTasks.getText());</span>
+<span class="nc" id="L326">      this.week.setMaxEvents(maxEvent);</span>
+<span class="nc" id="L327">      this.week.setMaxTasks(maxTask);</span>
+<span class="nc" id="L328">      this.commitPopup.hide();</span>
+    } else {
+<span class="nc" id="L330">      Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L331">      alert.setTitle(&quot;Error&quot;);</span>
+<span class="nc" id="L332">      alert.setHeaderText(&quot;Invalid Input&quot;);</span>
+<span class="nc" id="L333">      alert.setContentText(&quot;Please enter a valid number&quot;);</span>
+<span class="nc" id="L334">      alert.showAndWait();</span>
+    }
+<span class="nc" id="L336">  }</span>
+
+  private boolean validateCommit(int maxTask, int maxEvent) {
+<span class="nc" id="L339">    boolean valid = true;</span>
+    try {
+<span class="nc" id="L341">      maxEvent = Integer.parseInt(maxEvents.getText());</span>
+<span class="nc" id="L342">      maxTask = Integer.parseInt(maxTasks.getText());</span>
+<span class="nc" id="L343">    } catch (NumberFormatException e) {</span>
+<span class="nc" id="L344">      valid = false;</span>
+<span class="nc" id="L345">    }</span>
+
+<span class="nc bnc" id="L347" title="All 4 branches missed.">    if (maxEvent &lt; 0 || maxTask &lt; 0) {</span>
+<span class="nc" id="L348">      valid = false;</span>
+    }
+<span class="nc" id="L350">    return valid;</span>
+  }
+
+  private void showCommitMaker() {
+<span class="nc" id="L354">    this.commitPopup.show(stage);</span>
+<span class="nc" id="L355">  }</span>
+
+  void eventMakerShow() throws IOException {
+<span class="nc" id="L358">    addEventMenuItem.setOnAction(event -&gt; showEventMaker());</span>
+<span class="nc" id="L359">    this.eventMaker = new Popup();</span>
+<span class="nc" id="L360">    FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(&quot;Event.fxml&quot;));</span>
+<span class="nc" id="L361">    loader.setController(this);</span>
+<span class="nc" id="L362">    Scene s = loader.load();</span>
+<span class="nc" id="L363">    this.eventMaker.getContent().add(s.getRoot());</span>
+<span class="nc" id="L364">    submitEvent.setOnAction(event -&gt; createEvent());</span>
+<span class="nc" id="L365">    closeEvent.setOnAction(event -&gt; this.eventMaker.hide());</span>
+<span class="nc" id="L366">  }</span>
+
+
+  private void createEvent() {
+<span class="nc" id="L370">    String name = eventNameTextField.getText();</span>
+<span class="nc" id="L371">    String description = eventDescriptionTextArea.getText();</span>
+<span class="nc" id="L372">    Day day = Day.fromString(eventDayChoiceBox.getValue().toString());</span>
+<span class="nc" id="L373">    String time = eventStartTimeChoiceBox.getValue().toString();</span>
+
+<span class="nc" id="L375">    Time startTime =</span>
+<span class="nc" id="L376">        new Time(Integer.parseInt(time.substring(0, 2)), Integer.parseInt(time.substring(3, 5)));</span>
+<span class="nc" id="L377">    int duration = 0;</span>
+    try {
+<span class="nc" id="L379">      duration = Integer.parseInt(eventDurationTextField.getText());</span>
+<span class="nc" id="L380">    } catch (NumberFormatException e) {</span>
+<span class="nc" id="L381">    }</span>
+<span class="nc bnc" id="L382" title="All 2 branches missed.">    if (validateEvent(name, description, day, startTime, duration) &amp;&amp;</span>
+<span class="nc bnc" id="L383" title="All 2 branches missed.">        isInteger(eventDurationTextField.getText())) {</span>
+<span class="nc bnc" id="L384" title="All 2 branches missed.">      if (eventsMet()) {</span>
+<span class="nc" id="L385">        this.week.addEvent(name, description, day, startTime, duration);</span>
+<span class="nc" id="L386">        updateGui();</span>
+<span class="nc" id="L387">        this.eventMaker.hide();</span>
+      } else {
+<span class="nc" id="L389">        Alert alert = new Alert(Alert.AlertType.WARNING);</span>
+<span class="nc" id="L390">        alert.setTitle(&quot;Warning&quot;);</span>
+<span class="nc" id="L391">        alert.setHeaderText(&quot;Exceeding Commitments&quot;);</span>
+<span class="nc" id="L392">        alert.showAndWait();</span>
+<span class="nc" id="L393">        this.week.addEvent(name, description, day, startTime, duration);</span>
+<span class="nc" id="L394">        updateGui();</span>
+<span class="nc" id="L395">        this.eventMaker.hide();</span>
+<span class="nc" id="L396">      }</span>
+    } else {
+<span class="nc" id="L398">      Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L399">      alert.setTitle(&quot;Error&quot;);</span>
+<span class="nc" id="L400">      alert.setHeaderText(&quot;Invalid event\nPlease fill in all fields and try again&quot;);</span>
+<span class="nc" id="L401">      alert.showAndWait();</span>
+    }
+
+
+<span class="nc" id="L405">  }</span>
+
+  private boolean eventsMet() {
+<span class="nc" id="L408">    Day day = Day.fromString(eventDayChoiceBox.getValue().toString());</span>
+<span class="nc" id="L409">    int counter = 0;</span>
+<span class="nc bnc" id="L410" title="All 2 branches missed.">    for (Event e : this.week.getEvents()) {</span>
+<span class="nc bnc" id="L411" title="All 2 branches missed.">      if (e.getDay().equals(day)) {</span>
+<span class="nc" id="L412">        counter++;</span>
+      }
+<span class="nc" id="L414">    }</span>
+
+<span class="nc bnc" id="L416" title="All 2 branches missed.">    if (counter &gt;= this.week.getMaxEvents()) {</span>
+<span class="nc" id="L417">      return false;</span>
+    } else {
+<span class="nc" id="L419">      return true;</span>
+    }
+  }
+
+  private boolean validateEvent(String name, String description, Day day, Time startTime,
+                                int duration) {
+<span class="nc bnc" id="L425" title="All 10 branches missed.">    return !name.isEmpty() || !description.isEmpty() || day != null || startTime != null ||</span>
+        duration &gt; 0;
+  }
+
+  public static boolean isInteger(String input) {
+<span class="nc" id="L430">    return input.matches(&quot;-?\\d+&quot;);</span>
+  }
+
+
+  private void createTask() {
+<span class="nc" id="L435">    String name = taskNameTextField.getText();</span>
+<span class="nc" id="L436">    String description = taskDescriptionTextArea.getText();</span>
+<span class="nc" id="L437">    Day day = null;</span>
+<span class="nc bnc" id="L438" title="All 2 branches missed.">    if (taskDayChoiceBox.getValue() == null) {</span>
+<span class="nc" id="L439">      Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L440">      alert.setTitle(&quot;Error&quot;);</span>
+<span class="nc" id="L441">      alert.setHeaderText(&quot;Please select a day&quot;);</span>
+<span class="nc" id="L442">      alert.showAndWait();</span>
+<span class="nc" id="L443">    } else {</span>
+<span class="nc" id="L444">      day = Day.fromString(taskDayChoiceBox.getValue().toString());</span>
+    }
+
+
+<span class="nc bnc" id="L448" title="All 2 branches missed.">    if (validateTask(name, description, day)) {</span>
+<span class="nc bnc" id="L449" title="All 2 branches missed.">      if (tasksMet()) {</span>
+<span class="nc" id="L450">        this.week.addTask(name, description, day);</span>
+<span class="nc" id="L451">        updateGui();</span>
+<span class="nc" id="L452">        this.taskMaker.hide();</span>
+      } else {
+<span class="nc" id="L454">        Alert alert = new Alert(Alert.AlertType.WARNING);</span>
+<span class="nc" id="L455">        alert.setTitle(&quot;Warning&quot;);</span>
+<span class="nc" id="L456">        alert.setHeaderText(&quot;Exceeding Commitments&quot;);</span>
+<span class="nc" id="L457">        alert.showAndWait();</span>
+<span class="nc" id="L458">        this.week.addTask(name, description, day);</span>
+<span class="nc" id="L459">        updateGui();</span>
+<span class="nc" id="L460">        this.taskMaker.hide();</span>
+<span class="nc" id="L461">      }</span>
+    } else {
+<span class="nc" id="L463">      Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L464">      alert.setTitle(&quot;Error&quot;);</span>
+<span class="nc" id="L465">      alert.setHeaderText(&quot;Invalid task\nPlease fill in all fields and try again&quot;);</span>
+<span class="nc" id="L466">      alert.showAndWait();</span>
+    }
+<span class="nc" id="L468">  }</span>
+
+  private boolean tasksMet() {
+<span class="nc" id="L471">    Day day = Day.fromString(taskDayChoiceBox.getValue().toString());</span>
+<span class="nc" id="L472">    int counter = 0;</span>
+<span class="nc bnc" id="L473" title="All 2 branches missed.">    for (Task t : this.week.getLot()) {</span>
+<span class="nc bnc" id="L474" title="All 2 branches missed.">      if (t.getDay().equals(day)) {</span>
+<span class="nc" id="L475">        counter++;</span>
+      }
+<span class="nc" id="L477">    }</span>
+
+<span class="nc bnc" id="L479" title="All 2 branches missed.">    if (counter &gt;= this.week.getMaxTasks()) {</span>
+<span class="nc" id="L480">      return false;</span>
+    } else {
+<span class="nc" id="L482">      return true;</span>
+    }
+  }
+
+  private boolean validateTask(String name, String description, Day day) {
+<span class="nc bnc" id="L487" title="All 6 branches missed.">    return !name.isEmpty() || !description.isEmpty() || day != null;</span>
+  }
+
+  private void updateGui() {
+
+    // populate tasks grid for every day of the week
+<span class="nc" id="L493">    populateTaskGrids();</span>
+    // populate events grid for every day of the week
+<span class="nc" id="L495">    populateEventGrids();</span>
+    // populate notes
+<span class="nc" id="L497">    populateNotes();</span>
+    // populate taskOverview
+<span class="nc" id="L499">    populateTaskOverview();</span>
+    // populate the weekly overview
+<span class="nc" id="L501">    populateWeeklyOverview();</span>
+    //populate progress bar
+<span class="nc" id="L503">    progressBar();</span>
+<span class="nc" id="L504">  }</span>
+
+  private void populateWeeklyOverview() {
+<span class="nc" id="L507">    totalEvents.setText(&quot;&quot; + this.week.getEvents().size());</span>
+<span class="nc" id="L508">    totalTasks.setText(&quot;&quot; + this.week.getLot().size());</span>
+<span class="nc" id="L509">    completedTasks.setText(</span>
+<span class="nc" id="L510">        &quot;&quot; + ((double) this.week.getCompletedTasks() / this.week.getLot().size()) * 100);</span>
+<span class="nc" id="L511">  }</span>
+
+  private void populateNotes() {
+<span class="nc" id="L514">    notesArea.setText(this.week.getNotes());</span>
+<span class="nc" id="L515">  }</span>
+
+  private void progressBar() {
+<span class="nc bnc" id="L518" title="All 2 branches missed.">    for (Tab tab : tabPane.getTabs()) {</span>
+      // creat event handler for each tab if tab pressed then update progress bar
+<span class="nc" id="L520">      tab.selectedProperty().addListener((observable, oldValue, newValue) -&gt; {</span>
+<span class="nc bnc" id="L521" title="All 2 branches missed.">        if (newValue) {</span>
+          // Tab is selected
+<span class="nc" id="L523">          updateProgressBar(tab.getText());</span>
+        }
+<span class="nc" id="L525">      });</span>
+
+<span class="nc" id="L527">      Tab initialTab = tabPane.getSelectionModel().getSelectedItem();</span>
+<span class="nc bnc" id="L528" title="All 2 branches missed.">      if (initialTab != null) {</span>
+<span class="nc" id="L529">        updateProgressBar(initialTab.getText());</span>
+      }
+<span class="nc" id="L531">    }</span>
+<span class="nc" id="L532">  }</span>
+
+  private void updateProgressBar(String tabName) {
+    // get total tasks from lot in week for that particular day
+<span class="nc" id="L536">    ArrayList&lt;Task&gt; currTasks = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L537" title="All 2 branches missed.">    for (Task t : this.week.getLot()) {</span>
+<span class="nc bnc" id="L538" title="All 2 branches missed.">      if (t.getDay().toString().equalsIgnoreCase(tabName)) {</span>
+<span class="nc" id="L539">        currTasks.add(t);</span>
+      }
+<span class="nc" id="L541">    }</span>
+<span class="nc" id="L542">    int totalTasks = currTasks.size();</span>
+<span class="nc" id="L543">    int completedTasks = 0;</span>
+<span class="nc bnc" id="L544" title="All 2 branches missed.">    for (Task t : currTasks) {</span>
+<span class="nc bnc" id="L545" title="All 2 branches missed.">      if (t.isCompleted()) {</span>
+<span class="nc" id="L546">        completedTasks++;</span>
+      }
+<span class="nc" id="L548">    }</span>
+    // get the n  of tasks completed
+    // update progress bar
+<span class="nc" id="L551">    progressBar.setProgress((double) completedTasks / totalTasks);</span>
+<span class="nc" id="L552">    remainingTaskLabel.setText(&quot;&quot; + (totalTasks - completedTasks));</span>
+<span class="nc" id="L553">  }</span>
+
+  private void populateEventGrids() {
+<span class="nc" id="L556">    List&lt;GridPane&gt; eventGrids = List.of(gridEvent1, gridEvent2, gridEvent3, gridEvent4, gridEvent5,</span>
+        gridEvent6, gridEvent7);
+<span class="nc" id="L558">    int counter = 0;</span>
+<span class="nc" id="L559">    int currDay = 0;</span>
+
+<span class="nc bnc" id="L561" title="All 2 branches missed.">    for (GridPane g : eventGrids) {</span>
+<span class="nc" id="L562">      g.getChildren().clear();</span>
+<span class="nc" id="L563">    }</span>
+
+<span class="nc bnc" id="L565" title="All 2 branches missed.">    for (Event e : this.week.getEvents()) {</span>
+<span class="nc" id="L566">      int indexOfGrid = e.getDay().ordinal();</span>
+<span class="nc" id="L567">      GridPane currGrid = eventGrids.get(indexOfGrid);</span>
+<span class="nc bnc" id="L568" title="All 2 branches missed.">      if (currDay != indexOfGrid) {</span>
+<span class="nc" id="L569">        counter = 0;</span>
+<span class="nc" id="L570">        currDay = indexOfGrid;</span>
+      }
+
+<span class="nc" id="L573">      String eventString = e.toString();</span>
+<span class="nc" id="L574">      String[] splitStrings = eventString.split(&quot;\\s+&quot;);</span>
+<span class="nc" id="L575">      TextFlow textFlow = new TextFlow();</span>
+<span class="nc bnc" id="L576" title="All 2 branches missed.">      for (String s : splitStrings) {</span>
+<span class="nc bnc" id="L577" title="All 4 branches missed.">        if (s.startsWith(&quot;http://&quot;) || s.startsWith(&quot;https://&quot;)) {</span>
+<span class="nc" id="L578">          Hyperlink link = new Hyperlink(s);</span>
+<span class="nc" id="L579">          link.setOnAction(ev -&gt; {</span>
+<span class="nc" id="L580">            hostServices.showDocument(link.getText());</span>
+<span class="nc" id="L581">          });</span>
+<span class="nc" id="L582">          textFlow.getChildren().add(link);</span>
+<span class="nc" id="L583">        } else {</span>
+<span class="nc" id="L584">          Text text = new Text(s);</span>
+<span class="nc" id="L585">          Text space = new Text(&quot; &quot;);</span>
+<span class="nc" id="L586">          textFlow.getChildren().addAll(text, space);</span>
+        }
+      }
+
+<span class="nc" id="L590">      HBox pane = new HBox(textFlow);</span>
+<span class="nc" id="L591">      pane.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L592">      currGrid.setConstraints(pane, 0, counter);</span>
+<span class="nc" id="L593">      currGrid.setHalignment(pane, HPos.CENTER);</span>
+<span class="nc" id="L594">      currGrid.setHgrow(pane, Priority.ALWAYS);</span>
+<span class="nc" id="L595">      currGrid.setVgrow(pane, Priority.ALWAYS);</span>
+<span class="nc" id="L596">      currGrid.getChildren().add(pane);</span>
+<span class="nc" id="L597">      counter++;</span>
+<span class="nc" id="L598">    }</span>
+<span class="nc" id="L599">  }</span>
+
+  private void populateTaskGrids() {
+<span class="nc" id="L602">    List&lt;GridPane&gt; taskGrids =</span>
+<span class="nc" id="L603">        List.of(gridTask1, gridTask2, gridTask3, gridTask4, gridTask5, gridTask6, gridTask7);</span>
+
+<span class="nc" id="L605">    int counter = 0;</span>
+<span class="nc" id="L606">    int currDay = -1; // Initialize with an invalid value</span>
+
+<span class="nc bnc" id="L608" title="All 2 branches missed.">    for (GridPane g : taskGrids) {</span>
+<span class="nc" id="L609">      g.getChildren().clear();</span>
+<span class="nc" id="L610">    }</span>
+
+<span class="nc bnc" id="L612" title="All 2 branches missed.">    for (Task t : this.week.getLot()) {</span>
+<span class="nc" id="L613">      int indexOfGrid = t.getDay().ordinal();</span>
+<span class="nc" id="L614">      GridPane currGrid = taskGrids.get(indexOfGrid);</span>
+
+<span class="nc bnc" id="L616" title="All 2 branches missed.">      if (currDay != indexOfGrid) {</span>
+<span class="nc" id="L617">        counter = 0;</span>
+<span class="nc" id="L618">        currDay = indexOfGrid;</span>
+      }
+
+<span class="nc" id="L621">      String taskString = t.toString();</span>
+<span class="nc" id="L622">      String[] splitStrings = taskString.split(&quot;\\s+&quot;);</span>
+<span class="nc" id="L623">      TextFlow textFlow = new TextFlow();</span>
+<span class="nc bnc" id="L624" title="All 2 branches missed.">      for (String s : splitStrings) {</span>
+<span class="nc bnc" id="L625" title="All 4 branches missed.">        if (s.startsWith(&quot;http://&quot;) || s.startsWith(&quot;https://&quot;)) {</span>
+<span class="nc" id="L626">          Hyperlink link = new Hyperlink(s);</span>
+<span class="nc" id="L627">          link.setOnAction(ev -&gt; {</span>
+<span class="nc" id="L628">            hostServices.showDocument(link.getText());</span>
+<span class="nc" id="L629">          });</span>
+<span class="nc" id="L630">          textFlow.getChildren().add(link);</span>
+<span class="nc" id="L631">        } else {</span>
+<span class="nc" id="L632">          Text text = new Text(s);</span>
+<span class="nc" id="L633">          Text space = new Text(&quot; &quot;);</span>
+<span class="nc" id="L634">          textFlow.getChildren().addAll(text, space);</span>
+        }
+      }
+
+<span class="nc" id="L638">      HBox pane = new HBox();</span>
+<span class="nc" id="L639">      VBox vBox = new VBox(textFlow);</span>
+<span class="nc" id="L640">      vBox.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L641">      pane.getChildren().add(vBox);</span>
+<span class="nc" id="L642">      pane.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L643">      CheckBox checkBox = new CheckBox();</span>
+<span class="nc" id="L644">      checkBox.setSelected(t.isCompleted()); // Set the default state based on isCompleted</span>
+<span class="nc" id="L645">      HBox hbox = new HBox(checkBox, pane);</span>
+<span class="nc" id="L646">      hbox.setSpacing(10);</span>
+<span class="nc" id="L647">      hbox.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L648">      currGrid.setConstraints(hbox, 0, counter);</span>
+<span class="nc" id="L649">      currGrid.setHalignment(hbox, HPos.CENTER);</span>
+<span class="nc" id="L650">      currGrid.setHgrow(hbox, Priority.ALWAYS);</span>
+<span class="nc" id="L651">      currGrid.setVgrow(hbox, Priority.ALWAYS);</span>
+<span class="nc" id="L652">      currGrid.getChildren().add(hbox);</span>
+<span class="nc" id="L653">      counter++;</span>
+
+      // Add a handler to the checkbox
+<span class="nc" id="L656">      checkBox.setOnAction(new EventHandler&lt;ActionEvent&gt;() {</span>
+        @Override
+        public void handle(ActionEvent event) {
+<span class="nc" id="L659">          t.setComplete(checkBox.isSelected());</span>
+<span class="nc" id="L660">          updateGui();</span>
+<span class="nc" id="L661">          progressBar();</span>
+<span class="nc" id="L662">        }</span>
+      });
+<span class="nc" id="L664">    }</span>
+<span class="nc" id="L665">  }</span>
+
+  private void populateTaskOverview() {
+<span class="nc" id="L668">    taskOverviewGrid.getChildren().clear();</span>
+<span class="nc" id="L669">    int counter = 0;</span>
+<span class="nc bnc" id="L670" title="All 2 branches missed.">    for (Task t : this.week.getLot()) {</span>
+      //int lastRowIndex = GridPane.getRowIndex(taskOverviewGrid.getChildren().get(taskOverviewGrid.getChildren().size() - 1));
+<span class="nc" id="L672">      Label label = new Label(t.getName());</span>
+<span class="nc" id="L673">      taskOverviewGrid.setConstraints(label, 0, counter);</span>
+<span class="nc" id="L674">      taskOverviewGrid.setHalignment(label, HPos.CENTER);</span>
+<span class="nc" id="L675">      taskOverviewGrid.setHgrow(label, Priority.ALWAYS);</span>
+<span class="nc" id="L676">      taskOverviewGrid.setVgrow(label, Priority.ALWAYS);</span>
+<span class="nc" id="L677">      taskOverviewGrid.getChildren().add(label);</span>
+<span class="nc" id="L678">      counter++;</span>
+<span class="nc" id="L679">    }</span>
+<span class="nc" id="L680">  }</span>
+
+  private void searchBar() {
+<span class="nc" id="L683">    searchButton.setOnAction(e -&gt; searchResults(searchBar.getText()));</span>
+<span class="nc" id="L684">  }</span>
+
+  private void searchResults(String text) {
+<span class="nc" id="L687">    taskOverviewGrid.getChildren().clear();</span>
+<span class="nc" id="L688">    int counter = 0;</span>
+<span class="nc" id="L689">    ArrayList&lt;Task&gt; results = new ArrayList&lt;Task&gt;();</span>
+<span class="nc bnc" id="L690" title="All 2 branches missed.">    for (Task t : this.week.getLot()) {</span>
+      //int lastRowIndex = GridPane.getRowIndex(taskOverviewGrid.getChildren().get(taskOverviewGrid.getChildren().size() - 1));
+<span class="nc bnc" id="L692" title="All 2 branches missed.">      if (t.getName().contains(text)) {</span>
+<span class="nc" id="L693">        results.add(t);</span>
+      }
+<span class="nc" id="L695">    }</span>
+
+<span class="nc bnc" id="L697" title="All 2 branches missed.">    for (Task t : results) {</span>
+<span class="nc" id="L698">      Label label = new Label(t.getName());</span>
+<span class="nc" id="L699">      taskOverviewGrid.setConstraints(label, 0, counter);</span>
+<span class="nc" id="L700">      taskOverviewGrid.setHalignment(label, HPos.CENTER);</span>
+<span class="nc" id="L701">      taskOverviewGrid.setHgrow(label, Priority.ALWAYS);</span>
+<span class="nc" id="L702">      taskOverviewGrid.setVgrow(label, Priority.ALWAYS);</span>
+<span class="nc" id="L703">      taskOverviewGrid.getChildren().add(label);</span>
+<span class="nc" id="L704">      counter++;</span>
+<span class="nc" id="L705">    }</span>
+<span class="nc" id="L706">  }</span>
+
+
+  void taskMakerShow() throws IOException {
+<span class="nc" id="L710">    addTaskMenuItem.setOnAction(event -&gt; showTaskMaker());</span>
+<span class="nc" id="L711">    this.taskMaker = new Popup();</span>
+<span class="nc" id="L712">    FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(&quot;Task.fxml&quot;));</span>
+<span class="nc" id="L713">    loader.setController(this);</span>
+<span class="nc" id="L714">    Scene s = loader.load();</span>
+<span class="nc" id="L715">    this.taskMaker.getContent().add(s.getRoot());</span>
+<span class="nc" id="L716">    submitTask.setOnAction(event -&gt; createTask());</span>
+<span class="nc" id="L717">    closeTask.setOnAction(event -&gt; this.taskMaker.hide());</span>
+<span class="nc" id="L718">  }</span>
+
+  private void showTaskMaker() {
+<span class="nc" id="L721">    this.taskMaker.show(this.stage);</span>
+<span class="nc" id="L722">  }</span>
+
+  @FXML
+  private void showEventMaker() {
+<span class="nc" id="L726">    this.eventMaker.show(this.stage);</span>
+<span class="nc" id="L727">  }</span>
+
+  @FXML
+  private void openFile() {
+<span class="nc" id="L731">    openMenuItem.setOnAction(e -&gt; {</span>
+<span class="nc" id="L732">      FileChooser fileChooser = new FileChooser();</span>
+<span class="nc" id="L733">      FileChooser.ExtensionFilter extensionFilter =</span>
+          new FileChooser.ExtensionFilter(&quot;Journal Files (*.bujo)&quot;, &quot;*.bujo&quot;);
+<span class="nc" id="L735">      fileChooser.getExtensionFilters().add(extensionFilter);</span>
+<span class="nc" id="L736">      File file = fileChooser.showOpenDialog(stage);</span>
+
+<span class="nc bnc" id="L738" title="All 2 branches missed.">      if (file != null) {</span>
+        try {
+<span class="nc" id="L740">          file = file.getAbsoluteFile();</span>
+<span class="nc" id="L741">          FileReader fileReader = new FileReader(file.toPath());</span>
+<span class="nc" id="L742">          this.file = file;</span>
+<span class="nc" id="L743">          WeekJson wj = fileReader.readBujo();</span>
+<span class="nc" id="L744">          Week w = wj.toWeek();</span>
+<span class="nc" id="L745">          passwordEnterShow(w);</span>
+<span class="nc" id="L746">        } catch (IOException ex) {</span>
+<span class="nc" id="L747">          throw new RuntimeException(ex);</span>
+<span class="nc" id="L748">        }</span>
+        // Handle the selected file
+
+      }
+<span class="nc" id="L752">    });</span>
+<span class="nc" id="L753">  }</span>
+
+  private void passwordEnterShow(Week w) throws IOException {
+<span class="nc" id="L756">    this.passwordEnter = new Popup();</span>
+<span class="nc" id="L757">    FXMLLoader loader =</span>
+<span class="nc" id="L758">        new FXMLLoader(getClass().getClassLoader().getResource(&quot;PasswordChecker.fxml&quot;));</span>
+<span class="nc" id="L759">    loader.setController(this);</span>
+<span class="nc" id="L760">    Scene s = loader.load();</span>
+<span class="nc" id="L761">    this.passwordEnter.getContent().add(s.getRoot());</span>
+<span class="nc" id="L762">    buttonCheckPassword.setOnAction(event -&gt; enterPassword(w));</span>
+<span class="nc" id="L763">    buttonClosePassword.setOnAction(event -&gt; passwordEnter.hide());</span>
+<span class="nc" id="L764">    this.passwordEnter.show(this.stage);</span>
+<span class="nc" id="L765">  }</span>
+
+  private void enterPassword(Week w) {
+<span class="nc bnc" id="L768" title="All 2 branches missed.">    if (enterPasswordField.getText().equals(w.getPassword())) {</span>
+<span class="nc" id="L769">      getDefault();</span>
+<span class="nc" id="L770">      updateGui();</span>
+<span class="nc" id="L771">      this.week = w;</span>
+<span class="nc" id="L772">      updateGui();</span>
+<span class="nc" id="L773">      this.passwordEnter.hide();</span>
+    } else {
+<span class="nc" id="L775">      Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L776">      alert.setTitle(&quot;Error&quot;);</span>
+<span class="nc" id="L777">      alert.setHeaderText(&quot;Password incorrect&quot;);</span>
+<span class="nc" id="L778">      alert.setContentText(&quot;Please try again&quot;);</span>
+<span class="nc" id="L779">      alert.showAndWait();</span>
+<span class="nc" id="L780">      enterPasswordField.clear();</span>
+    }
+<span class="nc" id="L782">  }</span>
+
+  @FXML
+  private void chooseTemplate() {
+<span class="nc" id="L786">    templateMenuItem.setOnAction(e -&gt; {</span>
+<span class="nc" id="L787">      FileChooser fileChooser = new FileChooser();</span>
+<span class="nc" id="L788">      FileChooser.ExtensionFilter extensionFilter =</span>
+          new FileChooser.ExtensionFilter(&quot;Journal Files (*.bujo)&quot;, &quot;*.bujo&quot;);
+<span class="nc" id="L790">      fileChooser.getExtensionFilters().add(extensionFilter);</span>
+<span class="nc" id="L791">      File file = fileChooser.showOpenDialog(stage);</span>
+
+<span class="nc bnc" id="L793" title="All 2 branches missed.">      if (file != null) {</span>
+        // Handle the selected file
+<span class="nc" id="L795">        file = file.getAbsoluteFile();</span>
+<span class="nc" id="L796">        FileReader fileReader = new FileReader(file.toPath());</span>
+<span class="nc" id="L797">        WeekJson wj = fileReader.readBujo();</span>
+<span class="nc" id="L798">        Week week = wj.toWeek();</span>
+<span class="nc" id="L799">        int maxEvents = week.getMaxEvents();</span>
+<span class="nc" id="L800">        int maxTasks = week.getMaxTasks();</span>
+<span class="nc" id="L801">        this.week.setMaxEvents(maxEvents);</span>
+<span class="nc" id="L802">        this.week.setMaxTasks(maxTasks);</span>
+      }
+<span class="nc" id="L804">    });</span>
+<span class="nc" id="L805">  }</span>
+
+  private void getDefault() {
+<span class="nc" id="L808">    this.week = new Week();</span>
+<span class="nc" id="L809">  }</span>
+
+  private void passwordMakerShow() throws IOException {
+<span class="nc" id="L812">    passwordMenuItem.setOnAction(event -&gt; showPasswordMaker());</span>
+<span class="nc" id="L813">    this.passwordSetterPopup = new Popup();</span>
+<span class="nc" id="L814">    FXMLLoader loader =</span>
+<span class="nc" id="L815">        new FXMLLoader(getClass().getClassLoader().getResource(&quot;PasswordSetter.fxml&quot;));</span>
+<span class="nc" id="L816">    loader.setController(this);</span>
+<span class="nc" id="L817">    Scene s = loader.load();</span>
+<span class="nc" id="L818">    this.passwordSetterPopup.getContent().add(s.getRoot());</span>
+<span class="nc" id="L819">    buttonCreatePassword.setOnAction(event -&gt; setPassword());</span>
+<span class="nc" id="L820">    buttonCreatePasswordClose.setOnAction(event -&gt; passwordSetterPopup.hide());</span>
+<span class="nc" id="L821">  }</span>
+
+  private void showPasswordMaker() {
+<span class="nc" id="L824">    this.passwordSetterPopup.show(this.stage);</span>
+<span class="nc" id="L825">  }</span>
+
+  private void setPassword() {
+<span class="nc" id="L828">    String password1 = this.password1.getText();</span>
+<span class="nc" id="L829">    String password2 = this.password2.getText();</span>
+<span class="nc bnc" id="L830" title="All 2 branches missed.">    if (password1.equals(password2)) {</span>
+<span class="nc" id="L831">      this.week.setPassword(password1);</span>
+<span class="nc" id="L832">      this.passwordSetterPopup.hide();</span>
+    } else {
+<span class="nc" id="L834">      Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L835">      alert.setTitle(&quot;Error&quot;);</span>
+<span class="nc" id="L836">      alert.setHeaderText(&quot;Passwords do not match&quot;);</span>
+<span class="nc" id="L837">      alert.setContentText(&quot;Please try again&quot;);</span>
+<span class="nc" id="L838">      alert.showAndWait();</span>
+    }
+<span class="nc" id="L840">  }</span>
+
+  private void saveFile() {
+
+<span class="nc" id="L844">    saveMenuItem.setOnAction(e -&gt; {</span>
+<span class="nc bnc" id="L845" title="All 2 branches missed.">      if (this.file == null) {</span>
+<span class="nc bnc" id="L846" title="All 2 branches missed.">        if (this.week.getPassword() == null) {</span>
+<span class="nc" id="L847">          Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L848">          alert.setTitle(&quot;Error&quot;);</span>
+<span class="nc" id="L849">          alert.setHeaderText(&quot;Must Set A Password!!!&quot;);</span>
+<span class="nc" id="L850">          alert.setContentText(&quot;Please try again&quot;);</span>
+<span class="nc" id="L851">          alert.showAndWait();</span>
+<span class="nc" id="L852">        } else {</span>
+<span class="nc" id="L853">          FileChooser fileChooser = new FileChooser();</span>
+<span class="nc" id="L854">          fileChooser.setTitle(&quot;Choose File Location&quot;);</span>
+
+<span class="nc" id="L856">          File file = fileChooser.showSaveDialog(stage);</span>
+<span class="nc bnc" id="L857" title="All 2 branches missed.">          if (file != null) {</span>
+<span class="nc" id="L858">            String fileName = file.getName();</span>
+
+            // Check if the file already has an extension
+<span class="nc" id="L861">            int dotIndex = fileName.lastIndexOf(&quot;.&quot;);</span>
+<span class="nc bnc" id="L862" title="All 2 branches missed.">            if (dotIndex &gt;= 0) {</span>
+              // Remove the existing extension
+<span class="nc" id="L864">              fileName = fileName.substring(0, dotIndex);</span>
+            }
+
+            // Append the &quot;.bujo&quot; extension
+<span class="nc" id="L868">            fileName += &quot;.bujo&quot;;</span>
+<span class="nc" id="L869">            file = new File(file.getParent(), fileName);</span>
+
+<span class="nc" id="L871">            this.file = file;</span>
+<span class="nc" id="L872">            this.week.setNotes(notesArea.getText());</span>
+<span class="nc" id="L873">            OutputFile outputFile = new OutputFile(this.file);</span>
+<span class="nc" id="L874">            outputFile.writeFile(JsonUtils.serializeRecord(this.week.toWeekJson()));</span>
+
+<span class="nc" id="L876">            saveMenuItem.fire();</span>
+
+          }
+<span class="nc" id="L879">        }</span>
+      } else {
+<span class="nc" id="L881">        this.week.setNotes(notesArea.getText());</span>
+<span class="nc" id="L882">        OutputFile outputFile = new OutputFile(this.file);</span>
+<span class="nc" id="L883">        outputFile.writeFile(JsonUtils.serializeRecord(this.week.toWeekJson()));</span>
+<span class="nc" id="L884">        System.out.println(&quot;File Saved&quot;);</span>
+<span class="nc" id="L885">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L886">        alert.setTitle(&quot;File Saved&quot;);</span>
+<span class="nc" id="L887">        alert.setHeaderText(&quot;File Saved Successfully&quot;);</span>
+<span class="nc" id="L888">        alert.showAndWait();</span>
+
+      }
+<span class="nc" id="L891">    });</span>
+<span class="nc" id="L892">  }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

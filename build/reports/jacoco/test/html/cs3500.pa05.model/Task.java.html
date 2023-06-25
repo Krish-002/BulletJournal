@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Task.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pa05-template</a> &gt; <a href="index.source.html" class="el_package">cs3500.pa05.model</a> &gt; <span class="el_source">Task.java</span></div><h1>Task.java</h1><pre class="source lang-java linenums">package cs3500.pa05.model;
+
+import cs3500.pa05.model.records.TaskJson;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javafx.scene.control.Hyperlink;
+
+public class Task {
+  private String name;
+  private String description;
+  private Day day;
+  private boolean isComplete;
+
+<span class="nc" id="L14">  public Task(String name, String description, Day day) {</span>
+<span class="nc" id="L15">    this.name = name;</span>
+<span class="nc" id="L16">    this.description = description;</span>
+<span class="nc" id="L17">    this.day = day;</span>
+<span class="nc" id="L18">    this.isComplete = false;</span>
+<span class="nc" id="L19">  }</span>
+
+<span class="fc" id="L21">  public Task(String name, String description, Day day, boolean isComplete) {</span>
+<span class="fc" id="L22">    this.name = name;</span>
+<span class="fc" id="L23">    this.description = description;</span>
+<span class="fc" id="L24">    this.day = day;</span>
+<span class="fc" id="L25">    this.isComplete = isComplete;</span>
+<span class="fc" id="L26">  }</span>
+
+  public String getName() {
+<span class="nc" id="L29">    return name;</span>
+  }
+
+  public void setComplete(boolean complete) {
+<span class="nc" id="L33">    isComplete = complete;</span>
+<span class="nc" id="L34">  }</span>
+
+  public TaskJson toTaskJson() {
+<span class="nc" id="L37">    return new TaskJson(this.name, this.description, this.day.toString(), this.isComplete);</span>
+  }
+
+  public Day getDay() {
+<span class="nc" id="L41">    return day;</span>
+  }
+
+  public String parseAndReplaceLinks(String input) {
+<span class="nc" id="L45">    String pattern = &quot;(http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&amp;+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+)&quot;;</span>
+<span class="nc" id="L46">    Pattern linkPattern = Pattern.compile(pattern);</span>
+<span class="nc" id="L47">    Matcher matcher = linkPattern.matcher(input);</span>
+
+<span class="nc" id="L49">    StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L50">    int lastIndex = 0;</span>
+
+<span class="nc bnc" id="L52" title="All 2 branches missed.">    while (matcher.find()) {</span>
+<span class="nc" id="L53">      String url = matcher.group(1);</span>
+<span class="nc" id="L54">      Hyperlink hyperlink = new Hyperlink(url);</span>
+
+<span class="nc" id="L56">      sb.append(input, lastIndex, matcher.start());</span>
+<span class="nc" id="L57">      sb.append(hyperlink);</span>
+
+<span class="nc" id="L59">      lastIndex = matcher.end();</span>
+<span class="nc" id="L60">    }</span>
+
+<span class="nc" id="L62">    sb.append(input.substring(lastIndex));</span>
+
+<span class="nc" id="L64">    return sb.toString();</span>
+  }
+
+  @Override
+    public String toString() {
+<span class="nc" id="L69">        return this.name + &quot;: &quot; + this.description;</span>
+    }
+
+  public boolean isCompleted() {
+<span class="nc" id="L73">    return this.isComplete;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pa05-template</a> &gt; <a href="index.source.html" class="el_package">cs3500.pa05.model.records</a> &gt; <span class="el_source">JsonUtils.java</span></div><h1>JsonUtils.java</h1><pre class="source lang-java linenums">package cs3500.pa05.model.records;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+<span class="nc" id="L6">public class JsonUtils {</span>
+  /**
+   * Converts a given record object to a String.
+   *
+   * @param record the record to convert
+   * @return the String representation of the given record
+   * @throws IllegalArgumentException if the record could not be converted correctly
+   */
+  public static String serializeRecord(Record record) {
+    try {
+<span class="fc" id="L16">      ObjectMapper mapper = new ObjectMapper();</span>
+<span class="fc" id="L17">      String string = mapper.convertValue(record, JsonNode.class).toString();</span>
+<span class="fc" id="L18">      return string;</span>
+<span class="nc" id="L19">    } catch (Exception e) {</span>
+<span class="nc" id="L20">      throw new IllegalArgumentException(&quot;Given record cannot be serialized&quot;);</span>
+    }
+  }
+
+  public static WeekJson deserializeRecord(String jsonString) {
+    try {
+<span class="fc" id="L26">      ObjectMapper mapper = new ObjectMapper();</span>
+<span class="fc" id="L27">      JsonNode node = mapper.readTree(jsonString);</span>
+<span class="fc" id="L28">      return mapper.treeToValue(node, WeekJson.class);</span>
+<span class="nc" id="L29">    } catch (Exception e) {</span>
+<span class="nc" id="L30">      throw new IllegalArgumentException(&quot;Given record cannot be deserialized&quot;);</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
